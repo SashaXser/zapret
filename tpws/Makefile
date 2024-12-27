@@ -1,5 +1,5 @@
 CC ?= gcc
-CFLAGS += -std=gnu99 -Os -flto=auto
+CFLAGS += -O2 -march=skylake -flto=auto
 CFLAGS_BSD = -Wno-address-of-packed-member
 LIBS = -lz -lpthread
 LIBS_ANDROID = -lz
