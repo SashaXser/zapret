@@ -139,7 +139,7 @@ bool strlist_add(struct str_list_head *head, const char *filename)
 }
 static void strlist_entry_destroy(struct str_list *entry)
 {
-	if (entry->str)	free(entry->str);
+	free(entry->str);
 	free(entry);
 }
 void strlist_destroy(struct str_list_head *head)
@@ -151,7 +151,6 @@ void strlist_destroy(struct str_list_head *head)
 		strlist_entry_destroy(entry);
 	}
 }
-
 
 
 
@@ -170,7 +169,7 @@ struct hostlist_file *hostlist_files_add(struct hostlist_files_head *head, const
 		}
 		else
 			entry->filename = NULL;
-		entry->mod_time = 0;
+		FILE_MOD_RESET(&entry->mod_sig);
 		entry->hostlist = NULL;
 		LIST_INSERT_HEAD(head, entry, next);
 	}
@@ -178,7 +177,7 @@ struct hostlist_file *hostlist_files_add(struct hostlist_files_head *head, const
 }
 static void hostlist_files_entry_destroy(struct hostlist_file *entry)
 {
-	if (entry->filename) free(entry->filename);
+	free(entry->filename);
 	StrPoolDestroy(&entry->hostlist);
 	free(entry);
 }
@@ -201,6 +200,13 @@ struct hostlist_file *hostlist_files_search(struct hostlist_files_head *head, co
 			return hfile;
 	}
 	return NULL;
+}
+void hostlist_files_reset_modtime(struct hostlist_files_head *list)
+{
+	struct hostlist_file *hfile;
+
+	LIST_FOREACH(hfile, list, next)
+		FILE_MOD_RESET(&hfile->mod_sig);
 }
 
 struct hostlist_item *hostlist_collection_add(struct hostlist_collection_head *head, struct hostlist_file *hfile)
@@ -384,7 +390,7 @@ struct ipset_file *ipset_files_add(struct ipset_files_head *head, const char *fi
 		}
 		else
 			entry->filename = NULL;
-		entry->mod_time = 0;
+		FILE_MOD_RESET(&entry->mod_sig);
 		memset(&entry->ipset,0,sizeof(entry->ipset));
 		LIST_INSERT_HEAD(head, entry, next);
 	}
@@ -392,7 +398,7 @@ struct ipset_file *ipset_files_add(struct ipset_files_head *head, const char *fi
 }
 static void ipset_files_entry_destroy(struct ipset_file *entry)
 {
-	if (entry->filename) free(entry->filename);
+	free(entry->filename);
 	ipsetDestroy(&entry->ipset);
 	free(entry);
 }
@@ -415,6 +421,13 @@ struct ipset_file *ipset_files_search(struct ipset_files_head *head, const char 
 			return hfile;
 	}
 	return NULL;
+}
+void ipset_files_reset_modtime(struct ipset_files_head *list)
+{
+	struct ipset_file *hfile;
+
+	LIST_FOREACH(hfile, list, next)
+		FILE_MOD_RESET(&hfile->mod_sig);
 }
 
 struct ipset_item *ipset_collection_add(struct ipset_collection_head *head, struct ipset_file *hfile)

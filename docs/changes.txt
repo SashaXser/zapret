@@ -440,4 +440,19 @@ v69.9
 init.d: exclude ipban from tpws redirection
 macos: fix install_easy
 macos: fix national decimal separator in sleep
-nfqws: apply relative markers to partial TLS ClientHello
+ipset: scripts maintenance
+
+v70
+
+blockcheck: override all dialog questions and enable batch mode
+blockcheck: parallel attempts
+nfqws: weaken wireguard initiation recognition. use len=148 and data[0]=1 signature
+nfqws: apply split+seqovl only to the first reasm fragment
+install_easy: dnf packager support
+nfqws,tpws: hostlist/ipset track not only file mod time but also file size
+nfqws,tpws,ipset: return lists reload on HUP
+nfqws,blockcheck: --dpi-desync-fake-tls-mod
+
+v70.1
+
+nfqws: --dpi-desync-fake-tls-mod=dupsid
