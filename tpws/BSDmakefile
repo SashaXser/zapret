@@ -1,5 +1,5 @@
 CC ?= cc
-CFLAGS += -std=gnu99 -s -Os -flto=auto
+CFLAGS += -std=gnu99 -s -O3 -march=skylake -flto=auto
 LIBS = -lz -lpthread
 SRC_FILES = *.c
 

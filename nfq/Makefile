@@ -1,5 +1,5 @@
 CC ?= gcc
-CFLAGS += -std=gnu99 -Os -flto=auto
+CFLAGS += -std=gnu99 -O3 -march=skylake -flto=auto
 CFLAGS_SYSTEMD = -DUSE_SYSTEMD
 CFLAGS_BSD = -Wno-address-of-packed-member
 CFLAGS_CYGWIN = -Wno-address-of-packed-member -static
