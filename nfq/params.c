@@ -206,7 +206,7 @@ bool dp_fake_defaults(struct desync_profile *dp)
 			return false;
 	if (blob_collection_empty(&dp->fake_tls))
 	{
-		if (!blob_collection_add_blob(&dp->fake_tls,fake_tls_clienthello_default,sizeof(fake_tls_clienthello_default),4))
+		if (!blob_collection_add_blob(&dp->fake_tls,fake_tls_clienthello_default,sizeof(fake_tls_clienthello_default),4+sizeof(dp->fake_tls_sni)))
 			return false;
 	}
 	if (blob_collection_empty(&dp->fake_unknown))
@@ -222,23 +222,15 @@ bool dp_fake_defaults(struct desync_profile *dp)
 		memset(item->data,0,item->size);
 		item->data[0] = 0x40;
 	}
-	if (blob_collection_empty(&dp->fake_wg))
+	struct blob_collection_head **fake,*fakes_z64[] = {&dp->fake_wg, &dp->fake_dht, &dp->fake_discord, &dp->fake_stun, &dp->fake_unknown_udp,NULL};
+	for(fake=fakes_z64;*fake;fake++)
 	{
-		if (!(item=blob_collection_add_blob(&dp->fake_wg,NULL,64,0)))
-			return false;
-		memset(item->data,0,item->size);
-	}
-	if (blob_collection_empty(&dp->fake_dht))
-	{
-		if (!(item=blob_collection_add_blob(&dp->fake_dht,NULL,64,0)))
-			return false;
-		memset(item->data,0,item->size);
-	}
-	if (blob_collection_empty(&dp->fake_unknown_udp))
-	{
-		if (!(item=blob_collection_add_blob(&dp->fake_unknown_udp,NULL,64,0)))
-			return false;
-		memset(item->data,0,item->size);
+		if (blob_collection_empty(*fake))
+		{
+			if (!(item=blob_collection_add_blob(*fake,NULL,64,0)))
+				return false;
+			memset(item->data,0,item->size);
+		}
 	}
 	return true;
 }
@@ -269,14 +261,9 @@ static void dp_clear_dynamic(struct desync_profile *dp)
 	ipset_collection_destroy(&dp->ips_collection_exclude);
 	port_filters_destroy(&dp->pf_tcp);
 	port_filters_destroy(&dp->pf_udp);
-	blob_collection_destroy(&dp->fake_http);
-	blob_collection_destroy(&dp->fake_tls);
-	blob_collection_destroy(&dp->fake_unknown);
-	blob_collection_destroy(&dp->fake_unknown_udp);
-	blob_collection_destroy(&dp->fake_quic);
-	blob_collection_destroy(&dp->fake_wg);
-	blob_collection_destroy(&dp->fake_dht);
 	HostFailPoolDestroy(&dp->hostlist_auto_fail_counters);
+	struct blob_collection_head **fake,*fakes[] = {&dp->fake_http, &dp->fake_tls, &dp->fake_unknown, &dp->fake_unknown_udp, &dp->fake_quic, &dp->fake_wg, &dp->fake_dht, &dp->fake_discord, &dp->fake_stun, NULL};
+	for(fake=fakes;*fake;fake++) blob_collection_destroy(*fake);
 }
 void dp_clear(struct desync_profile *dp)
 {
